@@ -25,3 +25,23 @@ This project is designed to provide a practical understanding of Bézier curves 
 3. Application of linear interpolation for control point transformations.
 
 The project is part of the coursework for the **CAGD** course at Sofia University, aiming to combine theory and practice in computer graphics.
+# Interactive Bézier Curve with Polars
+
+This is a single-file Java program for creating and visualizing Bézier curves and their polars. No additional libraries or dependencies are required.
+
+## How to Run
+
+1. **Ensure Java is Installed**:
+   - Check if Java is installed by running:
+     ```bash
+     java -version
+     ```
+
+2. **Download the File**:
+   - Save `BezierPolar.java` to your computer.
+
+3. **Compile and Run**:
+   Open a terminal/command prompt in the directory containing the file and run:
+   ```bash
+   javac BezierPolar.java
+   java BezierPolar
