@@ -10,9 +10,10 @@ public class BezierPolar extends JPanel {
     private ArrayList<double[]> controlPoints = new ArrayList<>();
     private double t1 = 0.5;
     private int polarLevel = 1;
+    private boolean deleteMode = false;
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Interactive Bezier Curve and Polars");
+        JFrame frame = new JFrame("Interactive Bézier Curve with Polars");
         BezierPolar panel = new BezierPolar();
         frame.add(panel);
         frame.setSize(WIDTH, HEIGHT);
@@ -24,7 +25,11 @@ public class BezierPolar extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                controlPoints.add(new double[]{e.getX(), e.getY()});
+                if (deleteMode) {
+                    deleteControlPoint(e.getX(), e.getY());
+                } else {
+                    controlPoints.add(new double[]{e.getX(), e.getY()});
+                }
                 repaint();
             }
         });
@@ -41,9 +46,20 @@ public class BezierPolar extends JPanel {
                 } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     polarLevel++;
                 } else if (e.getKeyCode() == KeyEvent.VK_C) {
+                    deleteMode = true;
+                } else if (e.getKeyCode() == KeyEvent.VK_D) {
+                    controlPoints.clear();
+                } else if (e.getKeyCode() == KeyEvent.VK_N) {
                     controlPoints.clear();
                 }
                 repaint();
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_C) {
+                    deleteMode = false;
+                }
             }
         });
 
@@ -56,6 +72,13 @@ public class BezierPolar extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g2d.setColor(Color.BLACK);
+        g2d.drawString("t1 = " + String.format("%.2f", t1) + " (Use UP/DOWN keys to adjust)", 10, 20);
+        g2d.drawString("Polar Level: " + polarLevel + " (Use LEFT/RIGHT keys to adjust)", 10, 40);
+        g2d.drawString("Press 'C' and click to delete a control point", 10, 60);
+        g2d.drawString("Press 'D' to clear all points", 10, 80);
+        g2d.drawString("Press 'N' to start a new curve", 10, 100);
 
         g2d.setColor(Color.RED);
         for (double[] point : controlPoints) {
@@ -78,11 +101,6 @@ public class BezierPolar extends JPanel {
             g2d.setColor(getPolarColor(i));
             drawBezierCurve(g2d, points);
         }
-
-        g2d.setColor(Color.BLACK);
-        g2d.drawString("t1 = " + String.format("%.2f", t1) + " (Use UP/DOWN keys to adjust)", 10, 20);
-        g2d.drawString("Polar Level: " + polarLevel + " (Use LEFT/RIGHT keys to adjust)", 10, 40);
-        g2d.drawString("Press 'C' to clear points", 10, 60);
     }
 
     private void drawBezierCurve(Graphics2D g2d, double[][] points) {
@@ -130,8 +148,6 @@ public class BezierPolar extends JPanel {
             polarPoints[i][1] = (1 - t1) * points[i][1] + t1 * points[i + 1][1];
         }
 
-
-
         return polarPoints;
     }
 
@@ -142,6 +158,18 @@ public class BezierPolar extends JPanel {
             case 3: return Color.ORANGE;
             default:
                 return new Color((level * 40) % 256, (level * 70) % 256, (level * 100) % 256);
+        }
+    }
+
+    private void deleteControlPoint(int mouseX, int mouseY) {
+        double threshold = 10.0; 
+        for (int i = 0; i < controlPoints.size(); i++) {
+            double[] point = controlPoints.get(i);
+            double distance = Math.sqrt(Math.pow(mouseX - point[0], 2) + Math.pow(mouseY - point[1], 2));
+            if (distance <= threshold) {
+                controlPoints.remove(i);
+                return;
+            }
         }
     }
 }
